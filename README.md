@@ -16,5 +16,28 @@ DB_PASSWORD= your oracle db password
 You need this so the service can access the database.
 ## Run the app
 
-    python manage.py
+    python manage.py runserver
 
+# REST API
+
+The REST API to the example app is described below.
+
+## Get list of Things
+
+### Request
+
+`GET /healthcheck/`
+
+
+### Response
+
+    {
+        "status": "OK",
+        "timestamp": 03/21/2021 16:22:00,
+        "dependencies": {
+            "xe": {
+                status: "OK",
+                timestamp: 03/21/2021 16:22:00,
+            }
+        }
+    }
