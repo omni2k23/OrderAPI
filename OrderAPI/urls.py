@@ -20,6 +20,5 @@ from views import healthcheck, orders
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('healthcheck/', healthcheck.healthcheck),
-    path('order/<int:user_id>/', orders.get_user_orders),
-    path('order/<int:user_id>/', orders.create_user_order)
+    path('order/<int:customer_id>/', orders.handle_order),
 ]
