@@ -1,7 +1,7 @@
 import json
 import jsonschema
 from datetime import datetime
-from models.models import Orders, Customer, Driver
+from models.models import Order, Customer, Driver
 from django.db import connection
 from django.core import serializers
 from django.http import JsonResponse, HttpRequest
@@ -23,7 +23,7 @@ def handle_order(request: HttpRequest, customer_id: int):
             response_body["error"] = ""
         else:
             query = 'SELECT * FROM public.order WHERE customer_id = %s;'
-            model = Orders.objects.raw(raw_query=query, params=[customer_id])
+            model = Order.objects.raw(raw_query=query, params=[customer_id])
             data = serializers.serialize("json", model)
 
             result = json.loads(data)
@@ -47,7 +47,7 @@ def handle_order(request: HttpRequest, customer_id: int):
             return JsonResponse(data=response_body, json_dumps_params={'indent': 2})
         
         # Creating the Order
-        order = Orders()
+        order = Order()
         
         customer = Customer()
         customer.customer_id = int(payload["customer_id"])
@@ -58,7 +58,7 @@ def handle_order(request: HttpRequest, customer_id: int):
         driver.save()
         
         # This will always create an order_id +1 from the latest order entry
-        order.order_id = Orders.objects.order_by('-order_id').first().order_id + 1
+        order.order_id = Order.objects.order_by('order_id').first().order_id + 1
         order.order_number = int(payload["order_number"])
         order.order_datetime = payload["order_datetime"]
         order.store_name = payload["store_name"]
@@ -66,6 +66,7 @@ def handle_order(request: HttpRequest, customer_id: int):
         order.driver_id = driver
         order.item_name = payload["item_name"]
         order.item_price = float(payload["item_price"])
+        order.item_picture = payload["item_picture"]
         order.total = float(payload["total"])
         order.status = payload["status"]
         
@@ -82,7 +83,7 @@ def handle_order(request: HttpRequest, customer_id: int):
             response_body["error"] = "The order_id is missing"
             return JsonResponse(data=response_body, json_dumps_params={'indent': 2})
         
-        order = Orders.objects.get(int(payload["order_id"]))
+        order = Order.objects.get(int(payload["order_id"]))
         if payload["driver_id"]:
             order.driver_id = int(payload["driver_id"])
         if payload["status"]:

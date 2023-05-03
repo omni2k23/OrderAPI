@@ -1,23 +1,7 @@
 from django.db import models
 
-class Orders(models.Model):
-    order_id = models.IntegerField(primary_key=True)
-    order_number = models.IntegerField()
-    order_datetime = models.DateTimeField()
-    store_name = models.TextField()
-    customer_id = models.ForeignKey('Customer', on_delete=models.CASCADE, db_column='customer_id')
-    driver_id = models.ForeignKey('Driver', on_delete=models.CASCADE, db_column='driver_id')
-    item_name = models.TextField()
-    item_price = models.DecimalField(max_digits=10, decimal_places=2)
-    total = models.DecimalField(max_digits=10, decimal_places=2, db_column="total ")
-    status = models.TextField()
-
-    class Meta:
-        app_label  = 'OrderAPI'
-        db_table = 'order'
-
 class Customer(models.Model):
-    customer_id = models.IntegerField(primary_key=True)
+    customer_id = models.AutoField(primary_key=True)
     email = models.TextField()
     password = models.TextField()
     first_name = models.TextField()
@@ -31,12 +15,12 @@ class Customer(models.Model):
     expiration_date = models.DateField()
 
     class Meta:
-        app_label  = 'OrderAPI'
-        db_table = 'customer'
-        
+        app_label = 'OrderAPI'
+        db_table = 'public.customer'
+
 
 class Driver(models.Model):
-    driver_id = models.IntegerField(primary_key=True)
+    driver_id = models.AutoField(primary_key=True)
     email = models.TextField()
     password = models.TextField()
     first_name = models.TextField()
@@ -49,5 +33,40 @@ class Driver(models.Model):
     model = models.TextField()
 
     class Meta:
-        app_label  = 'OrderAPI'
-        db_table = 'driver'
+        app_label = 'OrderAPI'
+        db_table = 'public.driver'
+
+
+class Order(models.Model):
+    order_id = models.AutoField(primary_key=True)
+    order_number = models.IntegerField(auto_created=True)
+    order_datetime = models.DateTimeField()
+    store_name = models.TextField()
+    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    item_name = models.TextField()
+    item_price = models.DecimalField(max_digits=10, decimal_places=2)
+    item_picture = models.TextField()
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.TextField()
+
+    class Meta:
+        app_label = 'OrderAPI'
+        db_table = 'public.order'
+        constraints = [
+            models.UniqueConstraint(fields=['order_number'], name='unique_order_number')
+        ]
+
+
+
+class Delivery(models.Model):
+    delivery_id = models.AutoField(primary_key=True)
+    driver_id = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    store_name = models.TextField()
+    store_address = models.TextField()
+    status = models.TextField()
+
+    class Meta:
+        app_label = 'OrderAPI'
+        db_table = 'public.delivery'
