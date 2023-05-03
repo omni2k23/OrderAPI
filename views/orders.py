@@ -7,6 +7,7 @@ from django.core import serializers
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.http import require_http_methods
 
+order_num = 1
 
 @require_http_methods(["GET", "POST"])
 def handle_order(request: HttpRequest, customer_id: int):
@@ -59,7 +60,8 @@ def handle_order(request: HttpRequest, customer_id: int):
         
         # This will always create an order_id +1 from the latest order entry
         order.order_id = Order.objects.order_by('order_id').first().order_id + 1
-        order.order_number = int(payload["order_number"])
+        order.order_number = int(order_num)
+        order_num += 1
         order.order_datetime = payload["order_datetime"]
         order.store_name = payload["store_name"]
         order.customer_id = customer

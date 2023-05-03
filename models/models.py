@@ -16,7 +16,7 @@ class Customer(models.Model):
 
     class Meta:
         app_label = 'OrderAPI'
-        db_table = 'public.customer'
+        db_table = 'customer'
 
 
 class Driver(models.Model):
@@ -34,12 +34,12 @@ class Driver(models.Model):
 
     class Meta:
         app_label = 'OrderAPI'
-        db_table = 'public.driver'
+        db_table = 'driver'
 
 
 class Order(models.Model):
     order_id = models.AutoField(primary_key=True)
-    order_number = models.IntegerField(auto_created=True)
+    order_number = models.IntegerField()
     order_datetime = models.DateTimeField()
     store_name = models.TextField()
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -52,12 +52,10 @@ class Order(models.Model):
 
     class Meta:
         app_label = 'OrderAPI'
-        db_table = 'public.order'
+        db_table = 'order'
         constraints = [
             models.UniqueConstraint(fields=['order_number'], name='unique_order_number')
         ]
-
-
 
 class Delivery(models.Model):
     delivery_id = models.AutoField(primary_key=True)
@@ -69,4 +67,4 @@ class Delivery(models.Model):
 
     class Meta:
         app_label = 'OrderAPI'
-        db_table = 'public.delivery'
+        db_table = 'delivery'
