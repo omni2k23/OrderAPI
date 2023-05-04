@@ -7,8 +7,6 @@ from django.core import serializers
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.http import require_http_methods
 
-order_num = 1
-
 @require_http_methods(["GET", "POST"])
 def handle_order(request: HttpRequest, customer_id: int):
     
@@ -33,20 +31,7 @@ def handle_order(request: HttpRequest, customer_id: int):
     elif request.method == 'POST':
         # Create dict from request
         payload = json.loads(request.body)
-        
-        # Validate payload
-        with open('schemas\order.json', 'r') as f:
-            schema = json.load(f)
-        
-        try:
-            jsonschema.validate(payload, schema)
-        except jsonschema.ValidationError as error:
-            status_code = 400
-            response_body["status"] = "Error"
-            response_body["description"] = "Could not validate request payload"
-            response_body["error"] = str(error)
-            return JsonResponse(data=response_body, json_dumps_params={'indent': 2})
-        
+             
         # Creating the Order
         order = Order()
         
@@ -58,10 +43,7 @@ def handle_order(request: HttpRequest, customer_id: int):
         driver.driver_id = int(payload["driver_id"])
         driver.save()
         
-        # This will always create an order_id +1 from the latest order entry
-        order.order_id = Order.objects.order_by('order_id').first().order_id + 1
-        order.order_number = int(order_num)
-        order_num += 1
+        order.order_number = payload["order_number"]
         order.order_datetime = payload["order_datetime"]
         order.store_name = payload["store_name"]
         order.customer_id = customer
